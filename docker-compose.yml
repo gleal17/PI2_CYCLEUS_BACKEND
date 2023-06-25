@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    image: 'postgres'
+    env_file:
+      - db.env
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - '8000:80'
+
+  user_api:
+    depends_on:
+      - db
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    ports:
+      - 4001:4001
+    command: bash -c "yarn && yarn dev"
+    #command: bash -c "yarn && yarn migration:run && yarn dev"
