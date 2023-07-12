@@ -1,6 +1,8 @@
-import { User } from '../database/entities/User';
-import { dataSource } from "../config"
-import jwt from 'jsonwebtoken'
+import { User } from "../database/entities/User";
+import { dataSource } from "../config";
+import jwt from "jsonwebtoken";
+import { Request, Response } from "express";
+import { Repository } from "typeorm";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, jwtToken, {
@@ -11,31 +13,31 @@ const generateToken = (id) => {
 export class UserController {
   private userRepository = dataSource.getRepository(User);
 
-  async getAllUsers(req, res) {
+  async getAllUsers(req: Request, res: Response) {
     try {
       const users = await dataSource.manager.find(User);
       res.status(200).json(users);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve users' });
+      res.status(500).json({ error: "Failed to retrieve users" });
     }
   }
 
-  async getUserByMatricula(req, res) {
+  async getUserByMatricula(req: Request, res: Response) {
     try {
       const { matricula } = req.params;
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: "User not found" });
       }
 
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve user' });
+      res.status(500).json({ error: "Failed to retrieve user" });
     }
   }
 
-  async createUser(req, res) {
+  async createUser(req: Request, res: Response) {
     try {
       const { matricula, fullName, email, password } = req.body;
 
@@ -49,11 +51,11 @@ export class UserController {
 
       res.status(201).json(user);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create user' });
+      res.status(500).json({ error: "Failed to create user" });
     }
   }
 
-  async updateUser(req, res) {
+  async updateUser(req: Request, res: Response) {
     try {
       const { matricula } = req.params;
       const { fullName, email, password } = req.body;
@@ -61,7 +63,7 @@ export class UserController {
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: "User not found" });
       }
 
       user.email = email || user.email;
@@ -72,29 +74,29 @@ export class UserController {
 
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update user' });
+      res.status(500).json({ error: "Failed to update user" });
     }
   }
 
-  async deleteUser(req, res) {
+  async deleteUser(req: Request, res: Response) {
     try {
       const { matricula } = req.params;
 
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: "User not found" });
       }
 
       await this.userRepository.remove(user);
 
-      res.json({ message: 'User deleted successfully' });
+      res.json({ message: "User deleted successfully" });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete user' });
+      res.status(500).json({ error: "Failed to delete user" });
     }
   }
 
-  async login(req, res) {
+  async login(req: Request, res: Response) {
     try {
       const { matricula, password } = req.body;
       const user = await this.userRepository.findOneBy(matricula);

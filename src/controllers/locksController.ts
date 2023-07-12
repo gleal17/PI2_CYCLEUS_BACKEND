@@ -1,13 +1,14 @@
 import { Lock } from '../database/entities/Lock';
 import { User } from '../database/entities/User';
 import { dataSource } from "../config"
+import { Request, Response } from 'express'
 
 export class LockController {
   private userRepository = dataSource.getRepository(User);
   private lockRepository = dataSource.getRepository(Lock);
 
 
-  async getStations(req, res) {
+  async getStations(req: Request, res: Response) {
     try {
 
       const stations = await dataSource.createQueryBuilder()
@@ -21,7 +22,7 @@ export class LockController {
     }
   }
 
-  async getLockById(req, res) {
+  async getLockById(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const lock = await this.lockRepository.findOneBy({
@@ -38,7 +39,7 @@ export class LockController {
     }
   }
 
-  async createLock(req, res) {
+  async createLock(req: Request, res: Response) {
     try {
       const { qrcode, station } = req.body;
 
@@ -54,7 +55,7 @@ export class LockController {
     }
   }
 
-  async updateLock(req, res) {
+  async updateLock(req: Request, res: Response) {
     try {
       const { qrcode, user } = req.params;
 
@@ -93,7 +94,7 @@ export class LockController {
     }
   }
 
-  async deleteLock(req, res) {
+  async deleteLock(req: Request, res: Response) {
     try {
       const { id } = req.params;
 

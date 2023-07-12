@@ -1,8 +1,10 @@
-import { UserController } from './controllers/locksController';
+import { UserController } from './controllers/usersController';
 import { LockController } from './controllers/locksController';
+import express from 'express'
 
-const express = require('express');
-const router = express.Router();
+export const router = express.Router();
+
+router.post('/create', UserController.createUser);
 
 router.get('/users', UserController.getAllUser);
 router.get('/users/:id', UserController.getUser)
@@ -12,5 +14,3 @@ router.post('register', UserController.registerUser);
 router.post('/stations', LockController.createStation);
 router.post('/logout', authenticateMiddleware, usersController.logout);
 
-
-module.exports = router;
