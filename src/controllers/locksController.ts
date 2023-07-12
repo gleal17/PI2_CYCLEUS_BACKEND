@@ -1,30 +1,32 @@
-import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import { Lock } from '../entities/Lock';
 import { User } from '../entities/User';
+import { dataSource } from "../database/config"
 
 export class LockController {
-  private lockRepository = getRepository(Lock);
+  private userRepository = dataSource.getRepository(User);
+  private lockRepository = dataSource.getRepository(Lock);
 
-  async getStations(req: Request, res: Response) {
+
+  async getStations(req, res) {
     try {
 
-      const query = this.lockRepository.createQueryBuilder('lock')
+      const stations = await dataSource.createQueryBuilder()
         .select('DISTINCT lock.station', 'station')
+        .from(Lock, "lock")
         .getRawMany();
 
-      const uniqueValues = await query;
-
-      res.status(200).json(uniqueValues);
+      res.status(200).json(stations);
     } catch (error) {
       res.status(500).json({ error: 'Failed to retrieve locks' });
     }
   }
 
-  async getLockById(req: Request, res: Response) {
+  async getLockById(req, res) {
     try {
       const { id } = req.params;
-      const lock = await this.lockRepository.findOne(id);
+      const lock = await this.lockRepository.findOneBy({
+        idLock: id,
+      })
 
       if (!lock) {
         return res.status(404).json({ error: 'Lock not found' });
@@ -36,7 +38,7 @@ export class LockController {
     }
   }
 
-  async createLock(req: Request, res: Response) {
+  async createLock(req, res) {
     try {
       const { qrcode, station } = req.body;
 
@@ -52,37 +54,46 @@ export class LockController {
     }
   }
 
-  async updateLock(req: Request, res: Response) {
+  async updateLock(req, res) {
     try {
       const { qrcode, user } = req.params;
 
-      const lock = await this.lockRepository.find({where: {QRCode: qrcode}});
+      const lock = await this.lockRepository.find({ where: { QRCode: qrcode } });
 
       if (!lock) {
         return res.status(404).json({ error: 'Lock not found' });
       }
 
-      if(lock[0].locked){
-        lock[0].locked = false;
-        lock[0].user = null;
-      }
-      else{
-        lock[0].locked = true;
-        const userRepository = getRepository(User);
-        const usuario = await userRepository.findOne(user);
-        if(usuario) throw new Error();
-        lock[0].user = usuario;
-      }
+      const usuario = await this.userRepository.findOne(user);
 
-      await this.lockRepository.save(lock[0]);
+      if (lock[0].locked) {
+        if (usuario == lock[0].user) {
+          lock[0].locked = false;
+          await this.lockRepository.save(lock[0]);
+          res.status(200).json(lock);
+        }
+      }
+      else if (usuario) {
+        const esperoNull = await this.lockRepository.findOneBy({
+          user: usuario,
+        });
+        if (!esperoNull) {
+          lock[0].locked = true;
+          if (!usuario) throw new Error();
+          lock[0].user = usuario;
+          await this.lockRepository.save(lock[0]);
+          res.status(200).json(lock);
+        }
+        else throw new Error();
+      }
+      res.status(500).json({error: 'Failed to update lock'});
 
-      res.status(200).json(lock);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update lock' });
     }
   }
 
-  async deleteLock(req: Request, res: Response) {
+  async deleteLock(req, res) {
     try {
       const { id } = req.params;
 

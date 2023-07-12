@@ -1,18 +1,19 @@
 {
   "name": "cycleus_backend",
   "version": "1.0.0",
-  "description": " backend projeto cycleus",
+  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon main.js",
-    "dev": "nodemon main.js",
-    "migration:run": "typeorm migration:run",
-    "migration:generate": "typeorm migration:generate",
-    "migration:revert": "typeorm migration:revert",
+    "start": "ts-node src/main.js",
+    "dev": "ts-node-dev --max_old_space_size=512 --respawn --transpile-only src/main.ts",
     "clean": "rimraf dist",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "typeorm": "ts-node-dev node_modules/.bin/typeorm",
     "db:seed": "ts-node-dev node_modules/typeorm-seeding/dist/cli.js seed",
+    "migration:generate": "npm run typeorm -- migration:generate src/db/migrations/default -d src/db/config.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/db/config.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/db/config.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "paths": {
@@ -49,12 +50,16 @@
     "nodemon": "^2.0.22",
     "pg": "^8.11.1",
     "pg-hstore": "^2.3.4",
+    "postgres": "^3.3.5",
     "prisma": "^5.0.0",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.4.1",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "typescript": "^5.1.6"
   }
 }

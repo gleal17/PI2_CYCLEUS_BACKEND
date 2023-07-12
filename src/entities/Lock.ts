@@ -13,9 +13,10 @@ export class Lock {
     @Column({ default: false })
     locked: boolean;
 
-    @Column()
+    @Column({ unique: true })
     station: string;
 
-    @OneToOne(() => User, user => user.matricula)
-    user: User;
+    @OneToOne(() => User, {nullable: true, default: null})
+    @JoinColumn()
+    user: User
 }
