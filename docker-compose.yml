@@ -2,19 +2,18 @@ version: '3.8'
 
 services:
   database:
-    image: 'postgres'
-    env_file:
-      - db.env
-    volumes:
-      - ./data:/var/lib/postgresql/database
+    image: postgres
+    container_name: cycleus-container
+    restart: always
     ports:
-      - '8000:80'
-    enviroment:
+      - 5432:5432
+    environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=database
+    volumes:
+      - pgdata:/data/postgres
 
 volumes:
   pgdata:
     driver: local
-    
