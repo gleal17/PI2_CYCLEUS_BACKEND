@@ -1,30 +1,32 @@
-import { NextFunction, Request, Response } from 'express'
-import { verify } from "jsonwebtoken"
+import { NextFunction, Request, Response } from 'express';
+import { verify } from 'jsonwebtoken';
 
-
-interface PayLoad {
-    userId: string
-    name: string
+interface Payload {
+  userId: string;
+  name: string;
 }
-const secrect = process.env.JWT_SECRET || ''
 
-export function UserAuth(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
-  const authToken = req.headers.authorization
-  if (!authToken) {
-    return res.status(401).end()
-  }
-  const [, token] = authToken.split(' ')
-  try {
-    const { role } = verify(token, secret) as PayLoad
-    if (role !== Role.ADMIN) {
-      return res.status(403).send(new NotAdminError().name)
+const secret = process.env.JWT_SECRET || '';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: Payload;
     }
-    return next()
+  }
+}
+
+export function UserAuth(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  try {
+    const payload = verify(token, secret) as Payload;
+    req.user = payload; // Assign the payload to the request object for later use
+    next();
   } catch (error) {
-    return res.status(401).end()
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 }

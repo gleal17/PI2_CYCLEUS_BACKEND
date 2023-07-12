@@ -1,40 +1,24 @@
-// import { express, json } from "express";
-// import cors from "cors";
-
-// import routes from "./routes.js";
-// import { AppDataSource } from "./database/config.js";
-
-// AppDataSource.initialize()
-//   .then(() => {
-//     console.log("Connected to database");
-//     const app = express();
-//     app.use(cors());
-//     app.use(json());
-//     app.use("users", routes);
-//     return app.listen(process.env.PORT)
-//   })
-//   .catch((err) => {
-//     console.log("Unable to connect to database", err);
-//   });
-
-
-// app.get("/", (req, res) => {
-//   console.log("get /");
-// });
-
-// app.listen(port, "0.0.0.0", () => {
-//   console.log(`Server running on port ${port}`);
-// });
-import express from 'express'
-import { AppDataSource } from './data-source'
+import 'reflect-metadata'
+import express, { json } from 'express'
 import routes from './routes'
+import { dataSource } from './config'
+import cors from 'cors'
 
-AppDataSource.initialize().then(() => {
-	const app = express()
+dataSource
+  .initialize()
+  .then(() => {
+    console.log('DataSource has been initialized!')
+  })
+  .catch((err) => {
+    console.error('Error DataSource:', err)
+  })
 
-	app.use(express.json())
+const port = Number(process.env.PORT) || 4001
+const app = express()
 
-	app.use(routes)
+app.use(cors())
 
-	return app.listen(process.env.PORT)
-})
+app.use(json())
+app.use('/user', routes)
+
+app.listen(port, '0.0.0.0', () => console.log(`rodando na porta ${port}`))

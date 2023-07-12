@@ -1,6 +1,6 @@
 import { Lock } from '../database/entities/Lock';
 import { User } from '../database/entities/User';
-import { dataSource } from "../database/config"
+import { dataSource } from "../config"
 
 export class LockController {
   private userRepository = dataSource.getRepository(User);

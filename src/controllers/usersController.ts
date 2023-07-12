@@ -1,5 +1,5 @@
 import { User } from '../database/entities/User';
-import { dataSource } from "../database/config"
+import { dataSource } from "../config"
 import jwt from 'jsonwebtoken'
 
 const generateToken = (id) => {
