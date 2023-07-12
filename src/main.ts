@@ -1,12 +1,10 @@
-import express from 'express'
+import { express, json } from 'express'
 import cors from 'cors'
-import { json } from 'express'
-import routes from './routes'
-import { dataSource } from './db/config';
 
-dataSource
-  .initialize()
-  .then(() => {
+import routes from 'routes.js'
+import { AppDataSource } from './database/config';
+
+AppDataSource.initialize().then(() => {
     console.log('Connected to database');
   })
   .catch((err) => {
@@ -14,7 +12,7 @@ dataSource
   })
 
 const app = express();
-const port = Number(process.env.PORT || 8080);
+const port = Number(process.env.PORT || 4002);
 
 app.use(cors());
 

@@ -1,5 +1,5 @@
-import { Lock } from '../entities/Lock';
-import { User } from '../entities/User';
+import { Lock } from '../database/entities/Lock';
+import { User } from '../database/entities/User';
 import { dataSource } from "../database/config"
 
 export class LockController {

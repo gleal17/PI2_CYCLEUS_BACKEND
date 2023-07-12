@@ -1,5 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, } from "typeorm";
-import { Lock } from './Lock';
+import { Entity, PrimaryColumn, Column } from "typeorm";
 
 @Entity()
 export class User {

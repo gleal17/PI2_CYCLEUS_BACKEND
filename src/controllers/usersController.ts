@@ -1,4 +1,4 @@
-import { User } from '../entities/User';
+import { User } from '../database/entities/User';
 import { dataSource } from "../database/config"
 import jwt from 'jsonwebtoken'
 
