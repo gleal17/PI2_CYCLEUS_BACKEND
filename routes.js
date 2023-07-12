@@ -1,12 +1,16 @@
+import { UserController } from './controllers/locksController';
+import { LockController } from './controllers/locksController';
+
 const express = require('express');
 const router = express.Router();
 
-const routes = Router()
-const usersController = require('./usersController');
-const stationsController = require('./stationsController');
+router.get('/users', UserController.getAllUser);
+router.get('/users/:id', UserController.getUser)
+router.get('/stations', LockController.getStations);
 
+router.post('register', UserController.registerUser);
+router.post('/stations', LockController.createStation);
+router.post('/logout', authenticateMiddleware, usersController.logout);
 
-router.use('/users', usersController);
-router.use('/stations', stationsController);
 
 module.exports = router;

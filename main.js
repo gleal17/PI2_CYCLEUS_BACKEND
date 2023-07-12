@@ -1,4 +1,3 @@
-//imports
 import express from 'express'
 import cors from 'cors'
 import { json } from 'express'
@@ -14,11 +13,9 @@ dataSource
     console.log('Unable to connect to database', err);
   })
 
-
-//iniciar express
 const app = express();
 const port = Number(process.env.PORT || 8080);
-//middlewares
+
 app.use(cors());
 
 app.use(json())

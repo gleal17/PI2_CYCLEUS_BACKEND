@@ -15,7 +15,7 @@ export class User {
   @Column({length: 50,})
   password: string;
 
-  @OneToOne(() => Lock)
+  @OneToOne(() => Lock, idlock => lock.idLock, {nullable: true})
   @JoinColumn()
   idLock: Lock;
 }
