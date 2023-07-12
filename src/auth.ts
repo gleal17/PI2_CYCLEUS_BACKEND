@@ -1,13 +1,14 @@
-const jwt = require('jsonwebtoken');
+import { NextFunction, Request, Response } from 'express';
+import * as jwt from 'jsonwebtoken';
 
-function generateToken(userId) {
+function generateToken(userId: string) {
   const payload = { userId };
-  const secretKey = '' //secret
+  const secretKey = ''; //secret
   const options = { expiresIn: '1h' };
   return jwt.sign(payload, secretKey, options);
 }
 
-function authenticateToken(req, res, next) {
+function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -20,7 +21,10 @@ function authenticateToken(req, res, next) {
       return res.status(403).json({ message: 'Token de autenticação inválido' });
     }
 
+    // Isso aqui tá certo mesmo??
+    // @ts-ignore
     req.user = user;
+
     next();
   });
 }

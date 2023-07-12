@@ -1,16 +1,20 @@
 import { UserController } from './controllers/usersController';
 import { LockController } from './controllers/locksController';
-import express from 'express'
+import express from 'express';
 
-export const router = express.Router();
+const router = express.Router();
 
-router.post('/create', UserController.createUser);
+const userController = new UserController();
+const lockController = new LockController();
 
-router.get('/users', UserController.getAllUser);
-router.get('/users/:id', UserController.getUser)
-router.get('/stations', LockController.getStations);
+router.post('/create', userController.createUser);
+router.get('/users', userController.getAllUsers);
 
-router.post('register', UserController.registerUser);
-router.post('/stations', LockController.createStation);
-router.post('/logout', authenticateMiddleware, usersController.logout);
+// Não existem ainda:
+// router.get('/users/:id', userController.getUser);
+// router.post('register', userController.registerUser);
+// router.get('/stations', lockController.getStations);
+// router.post('/stations', lockController.createStation);
+// router.post('/logout', authenticateMiddleware, usersController.logout);
 
+export { router as routes };

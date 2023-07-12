@@ -1,22 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, } from "typeorm"
-import { User } from "./User"
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { User } from './User';
 
 @Entity()
 export class Lock {
-    @PrimaryGeneratedColumn()
-    idLock: number;
+  @PrimaryGeneratedColumn()
+  idLock: number;
 
-    @Column("text")
-    QRCode: string;
+  @Column('text')
+  QRCode: string;
 
-    @Column({ default: false })
-    locked: boolean;
+  @Column({ default: false })
+  locked: boolean;
 
-    @Column({ unique: true })
-    station: string;
+  @Column({ unique: true })
+  station: string;
 
-    @OneToOne(() => User, {nullable: true, default: null})
-    @JoinColumn()
-    user: User
+  // Pq deve ser nullable?
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 }
