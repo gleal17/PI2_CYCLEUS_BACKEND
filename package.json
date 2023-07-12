@@ -33,7 +33,7 @@
     ],
     "@factories/*": [
       "src/database/factories/*"
-    ],
+    ]
   },
   "keywords": [],
   "author": "",
