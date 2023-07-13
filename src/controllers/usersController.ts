@@ -52,11 +52,7 @@ export class UserController {
 
       res.status(201).json(user);
     } catch (error) {
-<<<<<<< HEAD
       res.status(500).json({ error: 'Failed to create user', reason: error });
-=======
-      res.status(500).json({ error: 'Failed to create user' });
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
     }
   }
 

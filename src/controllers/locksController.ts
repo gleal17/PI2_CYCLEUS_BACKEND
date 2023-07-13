@@ -67,11 +67,7 @@ export class LockController {
       const usuario = await this.userRepository.findOne({
         where: {
           /* Aqui deve ser o email ou matrícula */
-<<<<<<< HEAD
           email: user
-=======
-          matricula: user
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
         }
       });
 
@@ -83,11 +79,7 @@ export class LockController {
         }
       } else if (usuario) {
         const esperoNull = await this.lockRepository.findOneBy({
-<<<<<<< HEAD
           user: Boolean(usuario.email)
-=======
-          user: usuario
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
         });
         if (!esperoNull) {
           lock[0].locked = true;

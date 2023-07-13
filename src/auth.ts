@@ -1,22 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 
-<<<<<<< HEAD
 export function generateToken(userId: string) {
-=======
-function generateToken(userId: string) {
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
   const payload = { userId };
   const secretKey = ''; //secret
   const options = { expiresIn: '1h' };
   return jwt.sign(payload, secretKey, options);
 }
 
-<<<<<<< HEAD
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
-=======
-function authenticateToken(req: Request, res: Response, next: NextFunction) {
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
