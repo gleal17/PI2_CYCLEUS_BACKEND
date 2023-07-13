@@ -1,24 +1,23 @@
-import { User } from "../database/entities/User";
-import { dataSource } from "../config";
-import jwt from "jsonwebtoken";
-import { Request, Response } from "express";
-import { Repository } from "typeorm";
+import { User } from '../database/entities/User';
+import { dataSource } from '../config';
+import jwt from 'jsonwebtoken';
+import { Request, Response } from 'express';
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, jwtToken, {
-    expiresIn: "3d",
+const generateToken = (id: any) => {
+  return jwt.sign({ id }, 'CHAVE MUITO SECRETA~', {
+    expiresIn: '3d'
   });
 };
 
 export class UserController {
   private userRepository = dataSource.getRepository(User);
 
-  async getAllUsers(req: Request, res: Response) {
+  async getAllUsers(_req: Request, res: Response) {
     try {
       const users = await dataSource.manager.find(User);
       res.status(200).json(users);
     } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve users" });
+      res.status(500).json({ error: 'Failed to retrieve users' });
     }
   }
 
@@ -28,12 +27,12 @@ export class UserController {
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: 'User not found' });
       }
 
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve user" });
+      res.status(500).json({ error: 'Failed to retrieve user' });
     }
   }
 
@@ -47,11 +46,13 @@ export class UserController {
       user.email = email;
       user.password = password;
 
-      await this.userRepository.save(user);
+      console.log('obj user criado: ', user);
+
+      return this.userRepository.save(user);
 
       res.status(201).json(user);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create user" });
+      res.status(500).json({ error: 'Failed to create user', reason: error });
     }
   }
 
@@ -63,7 +64,7 @@ export class UserController {
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: 'User not found' });
       }
 
       user.email = email || user.email;
@@ -74,7 +75,7 @@ export class UserController {
 
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ error: "Failed to update user" });
+      res.status(500).json({ error: 'Failed to update user' });
     }
   }
 
@@ -85,14 +86,14 @@ export class UserController {
       const user = await this.userRepository.findOne({ where: { matricula } });
 
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(404).json({ error: 'User not found' });
       }
 
       await this.userRepository.remove(user);
 
-      res.json({ message: "User deleted successfully" });
+      res.json({ message: 'User deleted successfully' });
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete user" });
+      res.status(500).json({ error: 'Failed to delete user' });
     }
   }
 
@@ -102,8 +103,8 @@ export class UserController {
       const user = await this.userRepository.findOneBy(matricula);
       if (!user) {
         return res.status(401).json({
-          error: "Usuário inexistente",
-          message: "Usuário inexistente",
+          error: 'Usuário inexistente',
+          message: 'Usuário inexistente'
         });
       }
       if (user.password === password) {
@@ -114,16 +115,16 @@ export class UserController {
           fullName: user.fullName,
           email: user.email,
           token: generateToken(user.matricula),
-          expiresIn,
+          expiresIn
         });
       } else {
         return res.status(401).json({
-          error: "Impossível autenticar",
-          message: "Senha ou usuário incorretos",
+          error: 'Impossível autenticar',
+          message: 'Senha ou usuário incorretos'
         });
       }
     } catch (error) {
-      return res.status(500).json({ error, message: "erro inesperado" });
+      return res.status(500).json({ error, message: 'erro inesperado' });
     }
   }
 }

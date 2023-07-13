@@ -1,22 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, } from "typeorm"
-import { User } from "./User"
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BaseEntity } from 'typeorm';
+import { User } from './User';
 
 @Entity()
-export class Lock {
-    @PrimaryGeneratedColumn()
-    idLock: number;
+export class Lock extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  idLock: number;
 
-    @Column("text")
-    QRCode: string;
+  @Column('text')
+  QRCode: string;
 
-    @Column({ default: false })
-    locked: boolean;
+  @Column({ default: false })
+  locked: boolean;
 
-    @Column({ unique: true })
-    station: string;
+  @Column({ unique: true })
+  station: string;
 
-    @OneToOne(() => User, {nullable: true, default: null})
-    @JoinColumn()
-    user: User
+  // lastUser
+  // currentUser
+
+  // timeOfLock
+  // timeOfUnlock
+
+  // @OneToOne(() => User, { nullable: true })
+  // @JoinColumn()
+  // user: User;
 }
