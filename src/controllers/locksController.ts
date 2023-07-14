@@ -15,6 +15,7 @@ export class LockController {
         .from(Lock, 'lock')
         .getRawMany();
 
+      if(!stations) res.status(204);
       res.status(200).json(stations);
     } catch (error) {
       res.status(500).json({ error: 'Failed to retrieve locks' });
@@ -56,7 +57,7 @@ export class LockController {
 
   async updateLock(req: Request, res: Response) {
     try {
-      const { qrcode, user /* Esse user é o email ou matrícula? */ } = req.params;
+      const { qrcode, matrícula } = req.params;
 
       const lock = await this.lockRepository.find({ where: { QRCode: qrcode } });
 
@@ -66,13 +67,12 @@ export class LockController {
 
       const usuario = await this.userRepository.findOne({
         where: {
-          /* Aqui deve ser o email ou matrícula */
-          email: user
+          matricula : matrícula
         }
       });
 
       if (lock[0].locked) {
-        if (usuario == lock[0].user) {
+        if (usuario == lock.user) {
           lock[0].locked = false;
           await this.lockRepository.save(lock[0]);
           res.status(200).json(lock);

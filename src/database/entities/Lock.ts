@@ -21,7 +21,7 @@ export class Lock extends BaseEntity {
   // timeOfLock
   // timeOfUnlock
 
-  // @OneToOne(() => User, { nullable: true })
-  // @JoinColumn()
-  // user: User;
+  @OneToOne(() => User, { nullable: true })
+  @JoinColumn()
+  user: User;
 }
