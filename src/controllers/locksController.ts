@@ -1,43 +1,9 @@
+import type { Request, Response } from 'express';
 import { Lock } from '../database/entities/Lock';
 import { User } from '../database/entities/User';
 import { dataSource } from '../config';
-import { Request, Response } from 'express';
 
 export class LockController {
-  private userRepository = dataSource.getRepository(User);
-  private lockRepository = dataSource.getRepository(Lock);
-
-  async getStations(req: Request, res: Response) {
-    try {
-      const stations = await dataSource
-        .createQueryBuilder()
-        .select('DISTINCT lock.station', 'station')
-        .from(Lock, 'lock')
-        .getRawMany();
-
-      if(!stations) res.status(204);
-      res.status(200).json(stations);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve locks' });
-    }
-  }
-
-  async getLockById(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const lock = await this.lockRepository.findOneBy({
-        idLock: parseInt(id)
-      });
-
-      if (!lock) {
-        return res.status(404).json({ error: 'Lock not found' });
-      }
-
-      res.status(200).json(lock);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to retrieve lock' });
-    }
-  }
 
   async createLock(req: Request, res: Response) {
     try {
@@ -51,62 +17,79 @@ export class LockController {
     }
   }
 
-  async updateLock(req: Request, res: Response) {
+  async getLockById(req: Request, res: Response) {
     try {
-      const { qrcode, matrícula } = req.params;
+      // Pega o ID do lock
+      const { idLock } = req.params;
 
-      const lock = await this.lockRepository.find({ where: { QRCode: qrcode } });
+      // Recebe um usuário ou undefined
+      const lock = await Lock.findOneBy({ idLock: parseInt(idLock) });
 
-      if (!lock) {
-        return res.status(404).json({ error: 'Lock not found' });
-      }
-
-      const usuario = await this.userRepository.findOne({
-        where: {
-          matricula : matrícula
-        }
-      });
-
-      if (lock[0].locked) {
-        if (usuario == lock.user) {
-          lock[0].locked = false;
-          await this.lockRepository.save(lock[0]);
-          res.status(200).json(lock);
-        }
-      } else if (usuario) {
-        const esperoNull = await this.lockRepository.findOneBy({
-          user: Boolean(usuario.email)
-        });
-        if (!esperoNull) {
-          lock[0].locked = true;
-          if (!usuario) throw new Error();
-          lock[0].user = usuario;
-          await this.lockRepository.save(lock[0]);
-          res.status(200).json(lock);
-        } else throw new Error();
-      }
-      res.status(500).json({ error: 'Failed to update lock' });
+      // Verifica se o lock existe
+      if (!lock) res.status(204);
+      // Retorna o lock
+      res.status(200).json(lock);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update lock' });
+      res.status(500).json({ error: 'Failed to retrieve lock' });
     }
   }
 
-  async deleteLock(req: Request, res: Response) {
-    try {
-      // ID é idLock, certo?
-      const { id } = req.params;
 
-      const lock = await this.lockRepository.findOne({ where: { idLock: parseInt(id) } });
+  async openLock(req: Request, res: Response) {
+    // Pega o ID do lock
+    const { qrcode, matricula } = req.params;
 
-      if (!lock) {
-        return res.status(404).json({ error: 'Lock not found' });
-      }
-
-      await this.lockRepository.remove(lock);
-
-      res.status(200).json({ message: 'Lock deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to delete lock' });
+    // Recebe um usuário ou undefined
+    const lock = await Lock.findOneBy({ QRCode: qrcode });
+    const user = await User.findOneBy({ matricula: matricula });
+    // Verifica se o lock existe
+    if (!lock) res.status(204);
+    else {
+      if (lock.user != user) res.status(403);
+      fetch('http://192.168.38.23/fechar_trava');
+      lock.locked = false;
+      await Lock.save(lock);
+      res.status(200);
     }
-  }
+    res.status(500);
+  };
+
+  async closeLock(req: Request, res: Response) {
+    // Pega o ID do lock
+    const { qrcode, matricula } = req.params;
+
+    const lock = await Lock.findOneBy({ QRCode: qrcode });
+    // Verifica se o lock existe
+    if (!lock) res.status(204);
+    else {
+      const user = await User.findOneBy({ matricula: matricula });
+      if (!user) res.status(400);
+      else {
+        if (lock.locked) res.status(403);
+        fetch('http://192.168.38.23/abrir_trava');
+        lock.locked = true;
+        lock.user = user;
+        await Lock.save(lock);
+        res.status(200);
+      }
+    }
+    res.status(500);
+  };
+
+  async getStations(req: Request, res: Response) {
+    const stations = dataSource.getRepository(Lock).createQueryBuilder("lock").distinctOn(["lock.station"]).orderBy("lock.station");
+    if (stations)
+      res.status(200).json(stations)
+    else
+      res.status(204);
+  };
+
+  async getByStation(req: Request, res: Response) {
+    const { station } = req.params
+    const lock = await Lock.findOneBy({ station: station });
+    if (lock)
+      res.status(200).json(lock)
+    else
+      res.status(204);
+  };
 }
