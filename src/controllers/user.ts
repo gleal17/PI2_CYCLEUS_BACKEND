@@ -52,7 +52,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const { fullName, email, password } = req.body as UserRequest;
 
     // Atualiza os dados do usuário no banco de dados
-    await User.update({ fullName, email, password }, { where: { matricula } });
+    //await User.update({ fullName, email, password }, { where: { matricula } });
 
     return res.status(200).json({ response: 'User updated' });
   } catch (error) {
