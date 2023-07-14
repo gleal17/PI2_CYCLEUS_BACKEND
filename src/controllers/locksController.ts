@@ -43,13 +43,9 @@ export class LockController {
     try {
       const { qrcode, station } = req.body;
 
-      const lock = new Lock();
-      lock.QRCode = qrcode;
-      lock.station = station;
-
-      await this.lockRepository.save(lock);
-
+      const lock = await Lock.insert({ QRCode: qrcode, station: station });
       res.status(201).json(lock);
+
     } catch (error) {
       res.status(500).json({ error: 'Failed to create lock' });
     }

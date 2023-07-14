@@ -45,10 +45,10 @@ export const updateLock = async (req: Request, res: Response) => {
 
 export const openLock = async (req: Request, res: Response) => {
   // Pega o ID do lock
-  const { idLock, matricula } = req.params;
+  const { qrcode, matricula } = req.params;
 
   // Recebe um usuário ou undefined
-  const lock = await Lock.findOneBy({ idLock: parseInt(idLock) });
+  const lock = await Lock.findOneBy({ QRCode: qrcode });
   const user = await User.findOneBy({ matricula: matricula });
   // Verifica se o lock existe
   if (!lock) res.status(204);
@@ -64,9 +64,9 @@ export const openLock = async (req: Request, res: Response) => {
 
 export const closeLock = async (req: Request, res: Response) => {
   // Pega o ID do lock
-  const { idLock, matricula } = req.params;
+  const { qrcode, matricula } = req.params;
 
-  const lock = await Lock.findOneBy({ idLock: parseInt(idLock) });
+  const lock = await Lock.findOneBy({ QRCode: qrcode });
   // Verifica se o lock existe
   if (!lock) res.status(204);
   else {
@@ -89,6 +89,15 @@ export const getStations = async (req: Request, res: Response) => {
   const stations = dataSource.getRepository(Lock).createQueryBuilder("lock").distinctOn(["lock.station"]).orderBy("lock.station");
   if (stations)
     res.status(200).json(stations)
+  else
+    res.status(204);
+};
+
+export const getByStation = async (req: Request, res: Response) => {
+  const { station } = req.params
+  const lock = await Lock.findOneBy({ station: station });
+  if (lock)
+    res.status(200).json(lock)
   else
     res.status(204);
 };
