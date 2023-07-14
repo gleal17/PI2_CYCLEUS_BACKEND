@@ -33,10 +33,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.0.0",
-<<<<<<< HEAD
     "@types/bcrypt": "^5.0.0",
-=======
->>>>>>> 34dad58743e7e5dc28271bf34f601731c54796e9
     "@types/jsonwebtoken": "^9.0.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
