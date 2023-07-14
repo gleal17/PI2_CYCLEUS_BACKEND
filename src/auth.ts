@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 
-export function generateToken(userId: string) {
-  const payload = { userId };
-  const secretKey = ''; //secret
-  const options = { expiresIn: '1h' };
-  return jwt.sign(payload, secretKey, options);
+export function generateToken(payload: object, secret: jwt.Secret, options: object): string  {
+  return jwt.sign(payload, secret, options);
 }
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
@@ -21,7 +18,6 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
       return res.status(403).json({ message: 'Token de autenticação inválido' });
     }
 
-    // Isso aqui tá certo mesmo??
     // @ts-ignore
     req.user = user;
 

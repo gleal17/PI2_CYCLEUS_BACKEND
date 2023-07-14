@@ -2,6 +2,9 @@ import { Entity, PrimaryColumn, Column, BaseEntity } from 'typeorm';
 
 @Entity()
 export class User extends BaseEntity {
+  id(id: any) {
+    throw new Error('Method not implemented.');
+  }
   @PrimaryColumn({ length: 9 })
   matricula: string;
 

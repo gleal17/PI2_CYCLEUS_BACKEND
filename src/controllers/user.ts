@@ -1,8 +1,9 @@
 import type { Request, Response } from 'express';
 import { UserRequest } from '../models/user';
 import { User } from '../database/entities/User';
-import { generateToken } from '../auth';
+import { authenticateToken, generateToken } from '../auth';
 import bcrypt from 'bcrypt';
+import { user } from '../handlers';
 
 // Criar novo usuário
 export const createUser = async (req: Request, res: Response) => {
@@ -45,21 +46,70 @@ export const getUserByMatricula = async (req: Request, res: Response) => {
 };
 
 // Atualiza dado do usuário
-export const updateUser = () => {};
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { matricula } = req.params;
+    const { fullName, email, password } = req.body as UserRequest;
 
-// Deleta usuário
-export const deleteUser = () => {};
+    // Atualiza os dados do usuário no banco de dados
+    await User.update({ fullName, email, password }, { where: { matricula } });
 
-export const login = () => {
-  // Cria JWT
-  // Atribui o jwt ao usuário
-  // generateToken()
+    return res.status(200).json({ response: 'User updated' });
+  } catch (error) {
+    return res.status(500).json({ response: 'An error occurred', error });
+  }
 };
 
-// Deslogar usuário do app
-export const logout = () => {
-  // JWT é valido?
-  // Pega o usuário atual
-  // Invalida o jwt
-  // Atualiza o DB
+// Deleta usuário
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { matricula } = req.params;
+
+    // Deleta o usuário no banco de dados
+    //await User.delete({ where: { matricula: Number(matricula) } });
+
+    return res.status(200).json({ response: 'User deleted' });
+  } catch (error) {
+    return res.status(500).json({ response: 'An error occurred', error });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body as UserRequest;
+
+    // Verifica se o usuário existe no banco de dados
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ response: 'User not found' });
+    }
+
+    // Verifica se a senha está correta
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ response: 'Invalid password' });
+    }
+
+    // Gera um token JWT para autenticação
+    const token = ''; //generateToken() 
+
+    return res.status(200).json({ token });
+  } catch (error) {
+    return res.status(500).json({ response: 'An error occurred', error });
+  }
+};
+
+// Efetua logout do usuário
+export const logout = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as unknown as User; // Obtém o usuário autenticado a partir do middleware
+
+    // Invalida o token do usuário no banco de dados ou em qualquer outra lógica necessária
+
+    return res.status(200).json({ response: 'Logged out successfully' });
+  } catch (error) {
+    return res.status(500).json({ response: 'An error occurred', error });
+  }
 };

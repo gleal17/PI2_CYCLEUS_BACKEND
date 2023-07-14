@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import { Lock } from '../database/entities/Lock';
 import { User } from '../database/entities/User';
 import { dataSource } from '../config';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Cria novo lock
 export const createLock = async (req: Request, res: Response) => {
@@ -54,7 +56,7 @@ export const openLock = async (req: Request, res: Response) => {
   if (!lock) res.status(204);
   else {
     if (lock.user != user) res.status(403);
-    fetch('http://192.168.38.23/fechar_trava');
+    fetch(process.env.URL_CLOSE_LOCK || ' '); //ajustar
     lock.locked = false;
     await Lock.save(lock);
     res.status(200);
@@ -74,7 +76,7 @@ export const closeLock = async (req: Request, res: Response) => {
     if (!user) res.status(400);
     else {
       if (lock.locked) res.status(403);
-      fetch('http://192.168.38.23/abrir_trava');
+      fetch(process.env.URL_OPEN_LOCK || ' '); //ajustar
       lock.locked = true;
       lock.user = user;
       await Lock.save(lock);
